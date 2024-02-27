@@ -9,13 +9,5 @@ For this reason, there is a need to have some reasonable system/view of the usag
 One thing is the display of the entire structure, and the other is the investigation by the
 user when they want to look more closely at where, for example, one variable is used,
 or what variables are used for a particular advertising text, etc.
-An example of how it could look is my comment and the image in it
 
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Tech stack used: React + Vite + React Flow
