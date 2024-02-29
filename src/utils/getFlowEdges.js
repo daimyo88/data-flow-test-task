@@ -1,4 +1,4 @@
-import { mapDataToEdges } from "./index.js";
+import {mapDataToEdges, mapDataToEdgesInnerRelations} from "./index.js";
 import { CAMPAIGN_FIELDS_TO_EDGES_VARIABLES, CAMPAIGN_FIELDS_TO_EDGES_INNER_RELATIONS } from "../meta/constants.js";
 const getFlowEdges = (data) => {
     if (!data) {
@@ -41,13 +41,15 @@ const getFlowEdges = (data) => {
         for (const [key, value] of Object.entries(setting)) {
 
             if (CAMPAIGN_FIELDS_TO_EDGES_VARIABLES.includes(key)) {
+
+                const campaignInnerEdges = mapDataToEdgesInnerRelations(setting, value);
                 const variablesEdges = mapDataToEdges(
                     data?.variables?.variables,
                     value,
                     "placeholderName",
                     ["getPlaceholdersWithoutConditions", "getConditionsPlaceholders"]
                 );
-                campaignSettingsEdges = [...campaignSettingsEdges, ...variablesEdges];
+                campaignSettingsEdges = [...campaignSettingsEdges, ...campaignInnerEdges, ...variablesEdges];
             }
 
             if (CAMPAIGN_FIELDS_TO_EDGES_INNER_RELATIONS.includes(key)) {

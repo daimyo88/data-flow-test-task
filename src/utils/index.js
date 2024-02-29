@@ -52,8 +52,9 @@ function getValueByPath(obj, fieldPath) {
 export const mapDataToEdges = (source, target, sourceField, targetField) => {
     const targetFieldArray = Array.isArray(targetField) ? targetField : [targetField];
     const targetArray = Array.isArray(target) ? target : [target];
+    const sourceArray = Array.isArray(source) ? source : [source];
 
-    return source.reduce((acc, next) => {
+    return sourceArray.reduce((acc, next) => {
         const value1 = getValueByPath(next, sourceField);
 
         const matchingItems = targetArray.filter(item2 => {
@@ -73,6 +74,17 @@ export const mapDataToEdges = (source, target, sourceField, targetField) => {
 
         return acc;
     }, []);
+}
+
+export const mapDataToEdgesInnerRelations = (source, target) => {
+    const targetArray = Array.isArray(target) ? target : [target];
+    return targetArray.map(el => {
+        return {
+                id: '' + source.id + el.id,
+                source: '' + source.id,
+                target: '' + el.id
+        }
+    });
 }
 
 export const filterElementsByConnection = (elementId, elementsArray, connectionsArray) => {
