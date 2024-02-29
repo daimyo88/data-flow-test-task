@@ -1,68 +1,63 @@
-import { BASE_OFFSET } from "../meta/constants.js";
+import { BASE_OFFSET, COLORS } from "../meta/constants.js";
 
-function getXOffset(offset, chessMode, i) {
-    if (chessMode) {
-        return i === 0 || i % 2 === 0 ? offset[0] : offset[0] * 2;
-    } else {
-        return offset[0];
+function getPosition(offset, mode, i) {
+    switch (mode) {
+        case 'chess':
+            return {
+                x: i === 0 || i % 2 === 0 ? offset[0] : offset[0] * 2,
+                y: offset[1] + BASE_OFFSET.y * i
+            };
+        case 'horizontal':
+            return {
+                x: offset[0] + BASE_OFFSET.x * i,
+                y: offset[1] + BASE_OFFSET.y
+            };
+        case 'horizontal-chess':
+            return {
+                x: offset[0] + BASE_OFFSET.x * i,
+                y: offset[1] + BASE_OFFSET.y * i
+            };
+        default:
+            return {
+                x: offset[0],
+                y: offset[1] + BASE_OFFSET.y * i
+            };
     }
 }
 
-export const mapDataToNodes = (data = [], offset, color = '#ddd', chessMode) => {
-
-    if (Array.isArray(data)) {
-        return data.map((el, i) => {
-            return {
-                id: '' + el.id,
-                position: {
-                    x: getXOffset(offset, chessMode, i),
-                    y: offset[1] + BASE_OFFSET.y * i
-                },
-                sourcePosition: 'right',
-                targetPosition: 'left',
-                draggable: false,
-                style: {
-                    background: color,
-                    cursor: 'pointer'
-                },
-                data: {
-                    label: el.name
-                }
-            }
-        });
-    } else {
+export const mapDataToNodes = (data = [], offset, color = COLORS.default, mode = 'vertical', name = '') => {
+    const dataArray = Array.isArray(data) ? data : [data];
+    return dataArray.map((el, i) => {
         return {
-            id: '' + data.id,
-            position: {
-                x: offset[0],
-                y: offset[1]
-            },
+            id: '' + el.id,
+            position: getPosition(offset, mode, i),
             sourcePosition: 'right',
             targetPosition: 'left',
-            draggable: false,
             style: {
                 background: color,
                 cursor: 'pointer'
             },
             data: {
-                label: data.name
-            },
+                label: el.name || name
+            }
         }
-    }
+    });
+
 }
 
 function getValueByPath(obj, fieldPath) {
     return fieldPath.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
 
-export const mapDataToEdges = (array1, array2, field1, field2Paths) => {
-    const field2Array = Array.isArray(field2Paths) ? field2Paths : [field2Paths];
+export const mapDataToEdges = (source, target, sourceField, targetField) => {
+    const targetFieldArray = Array.isArray(targetField) ? targetField : [targetField];
+    const targetArray = Array.isArray(target) ? target : [target];
 
-    return array1.reduce((acc, item1) => {
-        const value1 = getValueByPath(item1, field1);
+    return source.reduce((acc, next) => {
+        const value1 = getValueByPath(next, sourceField);
 
-        const matchingItems = array2.filter(item2 => {
-            return field2Array.some(field2Path => {
+        const matchingItems = targetArray.filter(item2 => {
+            return targetFieldArray.some(field2Path => {
                 const value2 = getValueByPath(item2, field2Path);
                 return Array.isArray(value2) ? value2.includes(value1) : value2 === value1;
             });
@@ -70,8 +65,8 @@ export const mapDataToEdges = (array1, array2, field1, field2Paths) => {
 
         matchingItems.forEach(matchingItem => {
             acc.push({
-                id: '' + item1.id + matchingItem.id,
-                source: '' + item1.id,
+                id: '' + next.id + matchingItem.id,
+                source: '' + next.id,
                 target: '' + matchingItem.id
             });
         });
